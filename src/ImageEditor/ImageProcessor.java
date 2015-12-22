@@ -1,29 +1,21 @@
 package ImageEditor;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Hashtable;
-import java.util.Scanner;
-
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
-import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
@@ -32,11 +24,9 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
- * Final Project Image Filters Part 3
- * 
  * @author Quinn Luck 
- * CS 1410
- * 
+ *
+ * Various filters for images that are loaded in.
  */
 public class ImageProcessor extends JFrame implements ActionListener, ChangeListener {
 
@@ -47,6 +37,7 @@ public class ImageProcessor extends JFrame implements ActionListener, ChangeList
 	private JSlider gainSlider;
 	private JSlider biasSlider;
 	private JPanel sliderHolder;
+	private JPanel holder;
 	private JButton cume;
 	private BufferedImage originalImage;
 	private BufferedImage filteredImage;
@@ -54,8 +45,8 @@ public class ImageProcessor extends JFrame implements ActionListener, ChangeList
 	private boolean cumulative = false;
 	
 	public static void main(String[] args) {
-		ImageProcessor awesome = new ImageProcessor();
-		awesome.setVisible(true);
+		ImageProcessor proc = new ImageProcessor();
+		proc.setVisible(true);
 	}
 
 	/**
@@ -63,8 +54,10 @@ public class ImageProcessor extends JFrame implements ActionListener, ChangeList
 	 */
 	public ImageProcessor() {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		JPanel holder = new JPanel();
+		GUI = new ImageGUI();
+		holder = new JPanel();
 		holder.setLayout(new BorderLayout());
+		holder.setPreferredSize(new Dimension(800, 500));
 		sliderHolder = new JPanel();
 		sliderHolder.setLayout(new GridLayout(1,2));
 		panel = new JTabbedPane();
@@ -80,7 +73,7 @@ public class ImageProcessor extends JFrame implements ActionListener, ChangeList
 		labelTable.put(10, new JLabel("1.75"));
 		labelTable.put(12, new JLabel("2.0"));
 		gainSlider.setLabelTable(labelTable);
-		gainSlider.setToolTipText("Values < 0 lessens the contrast of the image, values > 0 greaten the contrast of the image");
+		gainSlider.setToolTipText("Values < 0 decrease the contrast of the image, values > 0 increase the contrast of the image");
 		gainSlider.setPaintLabels(true);
 		gainSlider.addChangeListener(this);
 		gainSlider.setEnabled(false);
@@ -94,15 +87,15 @@ public class ImageProcessor extends JFrame implements ActionListener, ChangeList
 		biasSlider.setEnabled(false);
 		sliderHolder.add(gainSlider);
 		sliderHolder.add(biasSlider);
-		sliderHolder.setVisible(false);
+		sliderHolder.setVisible(true);
 		holder.add(sliderHolder, BorderLayout.SOUTH);
 		holder.add(panel, BorderLayout.CENTER);
 		holder.add(cume, BorderLayout.NORTH);
 		setTitle("Image Filtering");
 		setContentPane(holder);
-		setPreferredSize(new Dimension(900, 900));
 		pack();
-		GUI = new ImageGUI();
+		System.out.println("starting Width: " + holder.getWidth());
+		System.out.println("starting Height: " + holder.getHeight());
 		setJMenuBar(GUI);
 		GUI.setActionListener(this);
 	}
@@ -111,6 +104,7 @@ public class ImageProcessor extends JFrame implements ActionListener, ChangeList
 	 * performs actions depending on which button is clicked.
 	 **/
 	public void actionPerformed(ActionEvent e) {
+		// I'm not totally sure what this does, I think its a check for whether or not we've loaded an image in or not.
 		if(e.getSource() instanceof JMenu){
 			if(!originalPanel.getSelectedBox().equals(new RegionBox(0, originalImage.getWidth(), 0, originalImage.getHeight()))){
 				GUI.getClock().setEnabled(false);
@@ -122,6 +116,7 @@ public class ImageProcessor extends JFrame implements ActionListener, ChangeList
 			}	
 			return;
 		}
+		// this is the check for the cumulative filter buttons.
 		if(e.getSource() instanceof JButton){
 			JButton button = (JButton) e.getSource();
 			if(cumulative){
@@ -135,7 +130,7 @@ public class ImageProcessor extends JFrame implements ActionListener, ChangeList
 		}		
 		if(filteredImage != null && cumulative)
 				originalImage = filteredImage;
-		
+		// Here is where we open and load a file.
 		if(e.getSource() instanceof JMenuItem){
 		JMenuItem item = (JMenuItem) e.getSource();
 		if (item == GUI.getLoad()) {
@@ -156,6 +151,7 @@ public class ImageProcessor extends JFrame implements ActionListener, ChangeList
 			}
 		}
 			originalPanel = new Image(originalImage, this);
+
 			if(panel.getTabCount() >= 1)
 				panel.setComponentAt(0, originalPanel);
 			else
@@ -198,13 +194,11 @@ public class ImageProcessor extends JFrame implements ActionListener, ChangeList
 		} 
 		else if (item == GUI.getGain()) {
 			biasSlider.setEnabled(false);
-			sliderHolder.setVisible(true);
 			gainSlider.setEnabled(true);
 			f = new GainFilter();			
 		} 
 		else if (item == GUI.getBias()) {
 			gainSlider.setEnabled(false);
-			sliderHolder.setVisible(true);
 			biasSlider.setEnabled(true);
 			f = new BiasFilter();		
 		} 
@@ -265,5 +259,29 @@ public class ImageProcessor extends JFrame implements ActionListener, ChangeList
 	public void setRotate(boolean enabled){
 		GUI.getClock().setEnabled(enabled);
 		GUI.getCounterclock().setEnabled(enabled);
+	}
+
+	public JPanel getMainPanel() {
+		return this.holder;
+	}
+
+	public void setNewSize(int _height, int _width){
+		System.out.println("newSize Width: " + _width);
+		System.out.println("newSize Height: " + _height);
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		int screenWidth = (int) screenSize.getWidth();
+		int screenHeight =(int) screenSize.getHeight();
+		System.out.println("screen Width: " + screenWidth);
+		System.out.println("screen Height: " + screenHeight);
+		if(_height <= screenHeight || _width <= screenWidth){
+			this.setPreferredSize(new Dimension(_height, _width));
+			this.pack();
+			System.out.println("actual Width: " + this.holder.getWidth());
+			System.out.println("actual Height: " + this.holder.getHeight());
+		}
+		else {
+			this.setPreferredSize(screenSize);
+			this.pack();
+		}
 	}
 }

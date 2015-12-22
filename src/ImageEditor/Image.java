@@ -28,7 +28,9 @@ public class Image extends JPanel implements MouseListener, MouseMotionListener 
 	public Image(BufferedImage img, ImageProcessor _processor){
 		image = img;
 		processor = _processor;
-		setPreferredSize(new Dimension(img.getHeight(), image.getWidth()));
+		System.out.println("Width of Image: " + image.getWidth());
+		System.out.println("Height of Image: " + image.getHeight());
+		processor.setNewSize(image.getHeight(), image.getWidth());
 		addMouseListener(this);
 		addMouseMotionListener(this);
 	}
@@ -56,14 +58,14 @@ public class Image extends JPanel implements MouseListener, MouseMotionListener 
 	 */
 	public RegionBox getSelectedBox(){
 		if(minX > maxX){
-			int mintemp = minX;
+			int minTemp = minX;
 			minX = maxX;
-			maxX = mintemp;
+			maxX = minTemp;
 		}
 		if(minY > maxY){
-			int mintemp = minY;
+			int minTemp = minY;
 			minY = maxY;
-			maxY = mintemp;
+			maxY = minTemp;
 		}
 		if(maxX == 0 && maxY == 0){
 			return new RegionBox(0, image.getWidth(), 0, image.getHeight());
@@ -93,18 +95,13 @@ public class Image extends JPanel implements MouseListener, MouseMotionListener 
 		minY = e.getY();
 	}
 
-	public void mouseReleased(MouseEvent e) {
-	}
+	public void mouseReleased(MouseEvent e) {}
 
-	public void mouseMoved(MouseEvent e) {
-	}
+	public void mouseMoved(MouseEvent e) {}
 
-	public void mouseClicked(MouseEvent e) {
-	}
+	public void mouseClicked(MouseEvent e) {}
 
-	public void mouseEntered(MouseEvent e) {
-	}
+	public void mouseEntered(MouseEvent e) {}
 	
-	public void mouseExited(MouseEvent e) {
-	}
+	public void mouseExited(MouseEvent e) {}
 }
