@@ -222,7 +222,7 @@ public class ImageProcessor extends JFrame implements ActionListener, ChangeList
 	}
 
 	/**
-	 * Method for Bians and Gain sliders
+	 * Method for Bias and Gain sliders
 	 */
 	public void stateChanged(ChangeEvent e) {
 		JSlider src = (JSlider)e.getSource();
@@ -273,14 +273,22 @@ public class ImageProcessor extends JFrame implements ActionListener, ChangeList
 		int screenHeight =(int) screenSize.getHeight();
 		System.out.println("screen Width: " + screenWidth);
 		System.out.println("screen Height: " + screenHeight);
-		if(_height <= screenHeight || _width <= screenWidth){
-			this.setPreferredSize(new Dimension(_height, _width));
+		if(_height > screenHeight && _width > screenWidth) {
+			this.setPreferredSize(screenSize);
 			this.pack();
-			System.out.println("actual Width: " + this.holder.getWidth());
-			System.out.println("actual Height: " + this.holder.getHeight());
+		}
+		else if(_height > screenHeight && _width <= screenWidth) {
+			this.setPreferredSize(new Dimension(screenHeight, _width));
+			this.pack();
+		}
+		else if (_width > screenWidth && _height <= screenHeight) {
+			this.setPreferredSize(new Dimension(_height, screenWidth));
+			this.pack();
 		}
 		else {
-			this.setPreferredSize(screenSize);
+			this.setPreferredSize(new Dimension(_height, _width));
+			System.out.println("actual Width: " + this.holder.getWidth());
+			System.out.println("actual Height: " + this.holder.getHeight());
 			this.pack();
 		}
 	}
